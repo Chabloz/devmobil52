@@ -1,10 +1,5 @@
 # DevMobil IM-52
 
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) (version 14 or higher)
-- [npm](https://www.npmjs.com/) (comes with Node.js)
-
 ### Installation
 
 1. Clone the repository:
@@ -36,16 +31,6 @@ npm run build
 ```bash
 npm run preview
 ```
-
-## 🎯 Educational Goals
-
-This project demonstrates:
-- Object-oriented programming in JavaScript
-- 2D vector mathematics implementation
-- Canvas 2D graphics and animation
-- Input handling and game loops
-- Mobile web development considerations
-- Modern JavaScript build tools (Vite)
 
 ## 📄 License
 
