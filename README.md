@@ -1,5 +1,52 @@
-# Vue 3 + Vite
+# DevMobil IM-52
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+### Prerequisites
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+- [Node.js](https://nodejs.org/) (version 14 or higher)
+- [npm](https://www.npmjs.com/) (comes with Node.js)
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/Chabloz/devmobil52.git
+cd devmobil52
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+### Development
+
+```bash
+npm run dev
+```
+
+
+### Build
+
+```bash
+npm run build
+```
+
+### Preview
+
+```bash
+npm run preview
+```
+
+## 🎯 Educational Goals
+
+This project demonstrates:
+- Object-oriented programming in JavaScript
+- 2D vector mathematics implementation
+- Canvas 2D graphics and animation
+- Input handling and game loops
+- Mobile web development considerations
+- Modern JavaScript build tools (Vite)
+
+## 📄 License
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
