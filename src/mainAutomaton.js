@@ -19,7 +19,6 @@ document.getElementById('menu-toggle').addEventListener('click', () => {
   panel.classList.toggle('hidden');
 });
 
-
 document.getElementById('freq').addEventListener('input', (event) => {
   MainLoop.setSimulationTimestep(1000 / parseInt(event.target.value));
 });
