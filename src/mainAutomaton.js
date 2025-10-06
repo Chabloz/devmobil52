@@ -32,7 +32,7 @@ document.getElementById('tile').addEventListener('input', (event) => {
   cellSize = parseInt(event.target.value);
   rows = Math.floor(ctx.canvas.height / cellSize);
   cols = Math.floor(ctx.canvas.width / cellSize);
-  automaton = new Automaton({rows, cols, cellSize, aliveProbability, birth, survival});;
+  automaton = new Automaton({rows, cols, cellSize, aliveProbability, birth, survival});
 });
 
 document.getElementById('alive').addEventListener('input', (event) => {
@@ -99,5 +99,9 @@ MainLoop
   .start();
 
 document.addEventListener('visibilitychange', () => {
-  document.hidden ? MainLoop.stop() : MainLoop.start();
+  if (document.hidden) {
+    MainLoop.stop();
+  } else if (!isPaused) {
+    MainLoop.start();
+  }
 });
