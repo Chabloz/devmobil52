@@ -1,4 +1,4 @@
-export class Matrix2 {
+export default class Matrix2 {
 
   constructor(rows, cols) {
     this.matrix = new Array(rows);

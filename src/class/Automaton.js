@@ -1,7 +1,7 @@
-import { Matrix2 } from './Matrix2.js';
+import Matrix2 from './Matrix2.js';
 import { moduloEuclidian } from '../utils/math.js';
 
-export class Automaton {
+export default class Automaton {
 
   constructor({rows, cols, cellSize, aliveProbability = 0.5, aliveColor = 'tomato', deadColor = '#000000', birth = [3], survival = [2, 3]}) {
     this.rows = rows;
@@ -56,12 +56,16 @@ export class Automaton {
     this.grid.matrix[row][col] = this.isAlive(row, col) ? 0 : 1;
   }
 
-  setBirthRule(birthRules) {
-    this.birth = new Set(birthRules);
+  setBirthRule(birth) {
+    this.birth = new Set(birth);
   }
 
-  setSurvivalRule(survivalRules) {
-    this.survival = new Set(survivalRules);
+  setSurvivalRule(survival) {
+    this.survival = new Set(survival);
+  }
+
+  setLiveColor(color) {
+    this.aliveColor = color;
   }
 
   applyRule() {
