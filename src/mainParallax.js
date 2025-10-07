@@ -80,3 +80,7 @@ MainLoop
   .setUpdate(tickPhysic)
   .setDraw(tickRender)
   .start();
+
+document.addEventListener('visibilitychange', () => {
+  document.hidden ? MainLoop.stop() : MainLoop.start();
+});

@@ -72,3 +72,13 @@ export function randomHSL(saturation = '50%', lightness = '50%') {
   const hue = randomInt(0, 360);
   return `hsl(${hue}, ${saturation}, ${lightness})`;
 }
+
+/**
+ * Euclidean modulo operation
+ * @param {number} op1 - First operand
+ * @param {number} op2 - Second operand (modulus)
+ * @returns {number} Euclidean modulo result
+ */
+export function moduloEuclidian(op1, op2) {
+  return ((op1 % op2) + op2) % op2;
+}

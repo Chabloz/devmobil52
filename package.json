@@ -6,14 +6,21 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "serv-chat": "node server/chat.mjs"
   },
   "dependencies": {
+    "@quasar/extras": "^1.17.0",
     "mainloop.js": "^1.0.4",
+<<<<<<< HEAD
+=======
+    "quasar": "^2.18.5",
+>>>>>>> 25426eac2d9fbbb7c3b63428f5a9b4d3b58f2b5e
     "vue": "^3.5.18",
     "wsmini": "^1.0.3"
   },
   "devDependencies": {
+    "@quasar/vite-plugin": "^1.10.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "vite": "^7.1.2"
   }
