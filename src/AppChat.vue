@@ -10,15 +10,17 @@
   const $q = useQuasar();
 
   ws.on('close', () => {
+    if (isAuth.value) {
+      $q.notify({
+        type: 'negative',
+        message: 'Connection to server lost !',
+        timeout: 2000,
+        position: 'top',
+      });
+    }
     isAuth.value = false;
     users.value = [];
     allMsg.value = [];
-    $q.notify({
-      type: 'negative',
-      message: 'Connection to server failed',
-      timeout: 3000,
-      position: 'top',
-    });
   });
 </script>
 
@@ -32,7 +34,7 @@
     <TheChatUsersList />
 
     <q-page-container>
-      <q-page padding>
+      <q-page padding :class="{ 'no-scroll': !isAuth }">
         <TheLoginPage v-if="!isAuth" />
         <TheChatMessagesList v-else />
       </q-page>
@@ -54,6 +56,10 @@
 
   .q-page {
     overflow-y: auto;
+  }
+
+  .no-scroll {
+    overflow: hidden !important;
   }
 
   .no-shadow {

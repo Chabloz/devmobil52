@@ -7,19 +7,49 @@
   const message = ref('');
   const inputMsg = ref(null);
 
-  async function handleSubmit() {
-    if (!message.value.trim()) return;
-    try {
-      await ws.pub('chat', {content: message.value});
-      message.value = '';
-      inputMsg.value.focus();
-    } catch (err) {
-      $q.notify({
-        type: 'negative',
-        message: 'Failed to send message. Please try again.',
-        timeout: 2000,
-        position: 'top',
+  function sendRpcCommand(command) {
+    const [cmd, ...content] = command.split(' ');
+    const data = content.join(' ');
+
+    ws.rpc(cmd, data)
+      .then((response) => {
+        message.value = '';
+        inputMsg.value.focus();
+      })
+      .catch((err) => {
+        if (err.message === 'Unknown rpc') err.message = `Unknown command: ${cmd}`;
+        $q.notify({
+          type: 'negative',
+          message:  err.message,
+          timeout: 2000,
+          position: 'top',
+        });
       });
+  }
+
+  function sendChatMessage(content) {
+    ws.pub('chat', {content})
+      .then(() => {
+        message.value = '';
+        inputMsg.value.focus();
+      })
+      .catch((err) => {
+        $q.notify({
+          type: 'negative',
+          message: 'Failed to send message. Please try again.',
+          timeout: 2000,
+          position: 'top',
+        });
+      });
+  }
+
+  function handleSubmit() {
+    if (!message.value.trim()) return;
+
+    if (message.value.startsWith('/')) {
+      sendRpcCommand(message.value);
+    } else {
+      sendChatMessage(message.value);
     }
   }
 

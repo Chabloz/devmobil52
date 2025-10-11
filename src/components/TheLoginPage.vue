@@ -19,6 +19,7 @@
       await ws.connect(username.value);
       await ws.sub('users', usersList => users.value = usersList);
       await ws.sub('chat', msg => allMsg.value.push(msg));
+      ws.onCmd('pm', msg => allMsg.value.push(msg));
       isAuth.value = true;
     } catch (err) {
       error.value = 'Connection to server failed';

@@ -8,8 +8,8 @@
   const {data: isDark} = useJsonStorage('isDark', null);
 
   function handleLogout() {
-    ws.close();
     isAuth.value = false;
+    ws.close();
   }
 
   function toggleDarkMode() {
