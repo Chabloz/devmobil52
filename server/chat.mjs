@@ -1,10 +1,12 @@
 import { WSServerPubSub, WSServerError } from 'wsmini';
-import { randomInt } from '../src/utils/math.js';
+import { createHash } from 'crypto';
 
 const userColors = ['#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#f1c40f', '#e91e63', '#009688', '#ff5722', '#8bc34a', '#4caf50', '#2196f3', '#9c27b0'];
 
-function getRandomColor() {
-  return userColors[randomInt(0, userColors.length - 1)];
+function getColorForUsername(username) {
+  const hash = createHash('md5').update(username).digest();
+  const index = hash[0] % userColors.length;
+  return userColors[index];
 }
 
 const wsServer = new WSServerPubSub({
@@ -16,7 +18,7 @@ const wsServer = new WSServerPubSub({
     if (token.length > 20) return false;
     return {
       username: token,
-      color: getRandomColor()
+      color: getColorForUsername(token)
     };
   }
 });
@@ -32,32 +34,43 @@ wsServer.addRpc('/em', (data, client) => {
   });
 });
 
-wsServer.addRpc('/pm', (data, client, fromSocket) => {
-  if (typeof data !== 'string' || data.trim().length === 0) throw new WSServerError('No message content');
+wsServer.addRpc('/pm', (data, {username, color}) => {
+  if (typeof data !== 'string' || data.trim().length < 3) throw new WSServerError('No message content');
   const [to, ...content] = data.split(' ');
   const msg = content.join(' ');
 
   const allClients = wsServer.getChannelClients('chat');
-  const toSocket = allClients.find(c => wsServer.clients.get(c).username === to);
-  if (!toSocket) throw new WSServerError('Recipient not found');
+  const toSockets = allClients.filter(c => wsServer.clients.get(c).username === to);
+  if (toSockets.length === 0) throw new WSServerError('Recipient not found');
+  const fromSockets = allClients.filter(c => wsServer.clients.get(c).username === username);
 
-  const toSend = {
+  const info = {
     type: 'pm',
     content: msg,
-    from: client.username,
+    from: username,
     to: to,
-    fromColor: client.color,
-    toColor: wsServer.clients.get(toSocket).color,
+    fromColor: color,
+    toColor: wsServer.clients.get(toSockets[0]).color,
     timestamp: Date.now(),
   };
-  wsServer.sendCmd(fromSocket, 'pm', toSend);
-  wsServer.sendCmd(toSocket, 'pm', toSend);
+
+  for (const fromSocket of fromSockets) {
+    wsServer.sendCmd(fromSocket, 'pm', info);
+  }
+  for (const toSocket of toSockets) {
+    wsServer.sendCmd(toSocket, 'pm', info);
+  }
 });
-
-
 
 // Channel for the list of connected users
 wsServer.addChannel('users', { usersCanPub: false });
+
+function sendUserList() {
+  const clientsData = wsServer.getChannelClientsData('chat');
+  const usersList = [...new Set(clientsData.map(({ username }) => username))];
+  wsServer.pub('users', usersList);
+  return true;
+}
 
 // Channel for the chat messages
 wsServer.addChannel('chat', {
@@ -72,19 +85,8 @@ wsServer.addChannel('chat', {
       timestamp: Date.now()
     };
   },
-
-  hookSubPost: () => {
-    const clientsData = wsServer.getChannelClientsData('chat');
-    const usersList = clientsData.map(({ username }) => username);
-    wsServer.pub('users', usersList);
-    return true;
-  },
-
-  hookUnsubPost: () => {
-    const clientsData = wsServer.getChannelClientsData('chat');
-    const usersList = clientsData.map(({ username }) => username);
-    wsServer.pub('users', usersList);
-  }
+  hookSubPost: sendUserList,
+  hookUnsubPost: sendUserList,
 });
 
 wsServer.start();

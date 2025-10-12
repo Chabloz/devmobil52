@@ -66,6 +66,7 @@
       v-model.trim="message"
       label="Message"
       class="full-width"
+      autocomplete="off"
     />
   </q-form>
 </template>
