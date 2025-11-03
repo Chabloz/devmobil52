@@ -36,7 +36,7 @@
     <q-page-container>
       <q-page padding :class="{ 'no-scroll': !isAuth }">
         <TheLoginPage v-if="!isAuth" />
-        <TheChatMessagesList v-else />
+        <TheChatMessagesList v-if="isAuth" />
       </q-page>
     </q-page-container>
 
@@ -59,10 +59,10 @@
   }
 
   .no-scroll {
-    overflow: hidden !important;
+    overflow: hidden;
   }
 
   .no-shadow {
-    box-shadow: none !important;
+    box-shadow: none;
   }
 </style>
