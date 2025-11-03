@@ -40,7 +40,7 @@
       </q-page>
     </q-page-container>
 
-    <q-footer class="q-pa-xs" :class="{ 'bg-dark': $q.dark.isActive, 'bg-grey-2': !$q.dark.isActive }" v-if="isAuth">
+    <q-footer v-if="isAuth" class="q-pa-xs" :class="{ 'bg-dark': $q.dark.isActive, 'bg-grey-2': !$q.dark.isActive }">
       <TheChatForm />
     </q-footer>
 
