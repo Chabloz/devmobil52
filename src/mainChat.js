@@ -1,9 +1,9 @@
-import { createApp } from 'vue';
-import { Quasar, Notify } from 'quasar';
-import App from './AppChat.vue';
 import '@quasar/extras/roboto-font/roboto-font.css';
 import '@quasar/extras/material-icons/material-icons.css';
 import 'quasar/dist/quasar.css';
+import { createApp } from 'vue';
+import { Quasar, Notify } from 'quasar';
+import App from './AppChat.vue';
 
 const myApp = createApp(App)
 myApp.use(Quasar, {
