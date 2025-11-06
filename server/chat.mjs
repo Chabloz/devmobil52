@@ -2,7 +2,7 @@ import { WSServerPubSub, WSServerError } from 'wsmini';
 import { createHash } from 'crypto';
 
 const port = process.env.VITE_WS_PORT ? parseInt(process.env.VITE_WS_PORT) : 8888;
-const origins = process.env.VITE_WS_HOST || 'localhost';
+const origins = process.env.VITE_WS_HOST ?? 'localhost';
 
 const userColors = ['#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#f1c40f', '#e91e63', '#009688', '#ff5722', '#8bc34a', '#4caf50', '#2196f3', '#9c27b0'];
 

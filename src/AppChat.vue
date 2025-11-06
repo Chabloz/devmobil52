@@ -36,11 +36,11 @@
     <q-page-container>
       <q-page padding :class="{ 'no-scroll': !isAuth }">
         <TheLoginPage v-if="!isAuth" />
-        <TheChatMessagesList v-else />
+        <TheChatMessagesList v-if="isAuth" />
       </q-page>
     </q-page-container>
 
-    <q-footer class="q-pa-xs" :class="{ 'bg-dark': $q.dark.isActive, 'bg-grey-2': !$q.dark.isActive }" v-if="isAuth">
+    <q-footer v-if="isAuth" class="q-pa-xs" :class="{ 'bg-dark': $q.dark.isActive, 'bg-grey-2': !$q.dark.isActive }">
       <TheChatForm />
     </q-footer>
 
@@ -59,10 +59,10 @@
   }
 
   .no-scroll {
-    overflow: hidden !important;
+    overflow: hidden;
   }
 
   .no-shadow {
-    box-shadow: none !important;
+    box-shadow: none;
   }
 </style>
