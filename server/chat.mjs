@@ -14,6 +14,11 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const httpServer = http.createServer(app);
 
+// API routes (for testing)
+app.get('/api/foo', (req, res) => {
+  res.json({ bar: 'baz' });
+});
+
 app.use(express.static(path.join(__dirname, '../dist')));
 
 wsServer.addRpc('/em', emoteCommand);
