@@ -1,11 +1,13 @@
 import { WSServerPubSub } from 'wsmini';
 import { getColorForUsername } from '../utils/colorGenerator.mjs';
 
-const port = process.env.VITE_WS_PORT ? parseInt(process.env.VITE_WS_PORT) : 8888;
 const origins = process.env.VITE_WS_HOST ?? 'localhost';
 
+/**
+ * WebSocket server instance
+ * Note: port is not specified here as it will use the HTTP server port
+ */
 export const wsServer = new WSServerPubSub({
-  port,
   origins,
   authCallback: (username) => {
     if (!username) return false;

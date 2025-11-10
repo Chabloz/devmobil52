@@ -1,34 +1,36 @@
-import { WSServerError } from 'wsmini';
+import express from 'express';
+import http from 'http';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { wsServer } from './store/wsStore.mjs';
 import { emoteCommand } from './commands/emote.mjs';
 import { privateMessageCommand } from './commands/privateMessage.mjs';
+import { setupUsersChannel } from './channels/users.mjs';
+import { setupChatChannel } from './channels/chat.mjs';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Create Express app
+const app = express();
+const httpServer = http.createServer(app);
+
+// Serve static files from dist folder
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// Register RPC commands
 wsServer.addRpc('/em', emoteCommand);
 wsServer.addRpc('/pm', privateMessageCommand);
 
-wsServer.addChannel('users', { usersCanPub: false });
+// Setup channels
+setupUsersChannel();
+setupChatChannel();
 
-function sendUserList() {
-  const clientsData = wsServer.getChannelClientsData('chat');
-  const usersList = [...new Set(clientsData.map(({ username }) => username))];
-  wsServer.pub('users', usersList);
-  return true;
-}
-
-wsServer.addChannel('chat', {
-  hookPub: (msg, client) => {
-    if (!msg || !msg.content || typeof msg.content !== 'string') throw new WSServerError('Invalid message format');
-    if (msg.content.length > 500) throw new WSServerError('Message too long (max 500 characters)');
-    return {
-      type: 'message',
-      content: msg.content,
-      username: client.username,
-      color: client.color,
-      timestamp: Date.now()
-    };
-  },
-  hookSubPost: sendUserList,
-  hookUnsubPost: sendUserList,
+// Start HTTP server and WebSocket server
+const port = process.env.VITE_WS_PORT ? parseInt(process.env.VITE_WS_PORT) : 8888;
+httpServer.listen(port, () => {
+  console.log(`HTTP server listening on http://localhost:${port}`);
 });
 
-wsServer.start();
+wsServer.start({ server: httpServer });
+console.log(`WebSocket server started on ws://localhost:${port}`);
