@@ -27,7 +27,7 @@ setupUsersChannel();
 setupChatChannel();
 
 // Start HTTP server and WebSocket server
-const port = process.env.VITE_WS_PORT ? parseInt(process.env.VITE_WS_PORT) : 8888;
+const port = process.env.VITE_WS_PORT ? parseInt(process.env.BACKEND_PORT) : 100000;
 httpServer.listen(port, () => {
   console.log(`HTTP server listening on http://localhost:${port}`);
 });
