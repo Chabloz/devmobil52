@@ -30,7 +30,5 @@ setupChatChannel();
 
 // Start HTTP server and WebSocket server
 const port = process.env.VITE_WS_PORT ? parseInt(process.env.BACKEND_PORT) : 100000;
-httpServer.listen(port, () => {
-  console.log(`HTTP server listening on http://localhost:${port}`);
-});
+httpServer.listen(port, () => console.log(`HTTP server listening on ${port}`));
 wsServer.start({ server: httpServer });
