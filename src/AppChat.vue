@@ -1,4 +1,5 @@
 <script setup>
+  import { onMounted, ref } from 'vue';
   import { useQuasar } from 'quasar';
   import { isAuth, ws, users, allMsg } from '@/store/chat.js';
   import TheChatToolbar from './components/TheChatToolbar.vue';
@@ -6,6 +7,7 @@
   import TheChatForm from './components/TheChatForm.vue';
   import TheChatMessagesList from './components/TheChatMessagesList.vue';
   import TheChatUsersList from './components/TheChatUsersList.vue';
+  import { connectToChat } from '@/store/chat.js';
 
   const $q = useQuasar();
 
@@ -22,6 +24,11 @@
     users.value = [];
     allMsg.value = [];
   });
+
+  const tryingAutoLogin = ref(true);
+  connectToChat()
+    .catch(() => {}) // silently fail if no valid JWT
+    .finally(() => tryingAutoLogin.value = false);
 </script>
 
 <template>
@@ -34,9 +41,12 @@
     <TheChatUsersList />
 
     <q-page-container>
-      <q-page padding :class="{ 'no-scroll': !isAuth }">
+      <q-page v-if="!tryingAutoLogin" padding :class="{ 'no-scroll': !isAuth }">
         <TheLoginPage v-if="!isAuth" />
         <TheChatMessagesList v-if="isAuth" />
+      </q-page>
+      <q-page v-if="tryingAutoLogin" class="flex flex-center">
+        <q-spinner size="50px" color="primary" />
       </q-page>
     </q-page-container>
 

@@ -1,5 +1,5 @@
 <script setup>
-  import { ws, isAuth, users, showUsersList } from '@/store/chat.js';
+  import { isAuth, users, showUsersList, logout } from '@/store/chat.js';
   import { useQuasar } from 'quasar';
   import { onMounted } from 'vue';
   import { useJsonStorage } from '@/composables/useJsonStorage.js';
@@ -8,9 +8,7 @@
   const {data: isDark} = useJsonStorage('isDark', null);
 
   function handleLogout() {
-    ws.close();
-    isAuth.value = false;
-    showUsersList.value = false;
+    logout();
   }
 
   function toggleDarkMode() {

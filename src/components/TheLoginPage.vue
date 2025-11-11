@@ -1,10 +1,11 @@
 <script setup>
   import { ref } from 'vue';
-  import { ws, isAuth, allMsg, users } from '@/store/chat.js';
+  import { connectToChat } from '@/store/chat.js';
   import { useFetchJson } from '@/composables/useFetchJson';
 
   const username = ref('');
   const password = ref('');
+  const rememberMe = ref(false);
   const isPwd = ref(true);
   const error = ref('');
 
@@ -14,7 +15,7 @@
     val => /^[A-Za-z]+$/.test(val) || 'Only letters (A-Z, a-z) allowed'
   ];
 
-  const { execute: loginAPI, loading, error: apiError } = useFetchJson({
+  const {data: loginData, execute: loginAPI, loading, error: apiError } = useFetchJson({
     url: '/api/auth/login',
     method: 'POST',
     immediate: false
@@ -23,24 +24,13 @@
   async function handleSubmit() {
     error.value = '';
     try {
-      // Authenticate with API to get token in cookie
       await loginAPI({
         username: username.value,
-        password: password.value
+        password: password.value,
+        rememberMe: rememberMe.value
       });
-
-      // Check if authentication failed
-      if (apiError.value) {
-        error.value = apiError.value.statusText || 'Authentication failed';
-        return;
-      }
-
-      // Connect to WebSocket after successful authentication
-      await ws.connect();
-      await ws.sub('users', usersList => users.value = usersList);
-      await ws.sub('chat', msg => allMsg.value.push(msg));
-      ws.onCmd('pm', msg => allMsg.value.push(msg));
-      isAuth.value = true;
+      if (apiError.value) throw new Error(apiError.value?.data?.error);
+      await connectToChat(loginData.value);
     } catch (err) {
       error.value = err.message || 'Connection failed';
     }
@@ -91,6 +81,13 @@
               />
             </template>
           </q-input>
+
+          <q-checkbox
+            v-model="rememberMe"
+            label="Remember me"
+            :disable="loading"
+            class="q-mb-md"
+          />
 
           <q-banner v-if="error" class="bg-negative text-white q-mb-md" rounded>
             <template v-slot:avatar>
