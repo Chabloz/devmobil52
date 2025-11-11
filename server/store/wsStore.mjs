@@ -10,7 +10,7 @@ function authCallback(token, request) {
   try {
     const cookies = parseCookies(request.headers.cookie);
     const authToken = cookies?.auth_token ?? token;
-    const decoded = jwt.verify(authToken, JWT_SECRET);
+    const decoded = jwt.verify(authToken, JWT_SECRET, { algorithms: ['HS256'] });
     const username = decoded.sub;
 
     if (!username) return false;

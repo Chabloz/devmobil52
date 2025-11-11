@@ -23,7 +23,10 @@ export function login(req, res) {
   const token = jwt.sign(
     { sub: username },
     JWT_SECRET,
-    { expiresIn: JWT_EXPIRES_IN }
+    {
+      expiresIn: JWT_EXPIRES_IN,
+      algorithm: 'HS256'
+    }
   );
 
   if (rememberMe) {
