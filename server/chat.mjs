@@ -14,7 +14,29 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const httpServer = http.createServer(app);
 
-// API routes (for testing)
+// Middleware to parse JSON bodies
+app.use(express.json());
+
+// API routes
+app.post('/api/auth/login', (req, res) => {
+  const { username } = req.body;
+  if (!username) {
+    return res.status(400).json({ error: 'Username is required' });
+  }
+  if (!/^[A-Za-z]+$/.test(username)) {
+    return res.status(400).json({ error: 'Username must contain only letters' });
+  }
+  if (username.length > 20) {
+    return res.status(400).json({ error: 'Username must be 20 characters or less' });
+  }
+
+  // TODO: Generate JWT token and set it in cookie
+  // const token = generateJWT({ username });
+  // res.cookie('auth_token', token, { httpOnly: true, secure: true, sameSite: 'strict' });
+
+  res.json({ success: true, username });
+});
+
 app.get('/api/foo', (req, res) => {
   res.json({ bar: 'baz' });
 });

@@ -1,9 +1,11 @@
 <script setup>
   import { ref } from 'vue';
   import { ws, isAuth, allMsg, users } from '@/store/chat.js';
+  import { useFetchJson } from '@/composables/useFetchJson';
 
   const username = ref('');
-  const loading = ref(false);
+  const password = ref('');
+  const isPwd = ref(true);
   const error = ref('');
 
   const usernameRules = [
@@ -12,19 +14,35 @@
     val => /^[A-Za-z]+$/.test(val) || 'Only letters (A-Z, a-z) allowed'
   ];
 
+  const { execute: loginAPI, loading, error: apiError } = useFetchJson({
+    url: '/api/auth/login',
+    method: 'POST',
+    immediate: false
+  });
+
   async function handleSubmit() {
     error.value = '';
-    loading.value = true;
     try {
-      await ws.connect(username.value);
+      // Authenticate with API to get token in cookie
+      await loginAPI({
+        username: username.value,
+        password: password.value
+      });
+
+      // Check if authentication failed
+      if (apiError.value) {
+        error.value = apiError.value.statusText || 'Authentication failed';
+        return;
+      }
+
+      // Connect to WebSocket after successful authentication
+      await ws.connect();
       await ws.sub('users', usersList => users.value = usersList);
       await ws.sub('chat', msg => allMsg.value.push(msg));
       ws.onCmd('pm', msg => allMsg.value.push(msg));
       isAuth.value = true;
     } catch (err) {
-      error.value = 'Connection to server failed';
-    } finally {
-      loading.value = false;
+      error.value = err.message || 'Connection failed';
     }
   };
 </script>
@@ -54,6 +72,26 @@
             </template>
           </q-input>
 
+          <q-input
+            v-model="password"
+            label="Password"
+            :type="isPwd ? 'password' : 'text'"
+            :disable="loading"
+            outlined
+            class="q-mb-md"
+          >
+            <template v-slot:prepend>
+              <q-icon name="lock" />
+            </template>
+            <template v-slot:append>
+              <q-icon
+                :name="isPwd ? 'visibility_off' : 'visibility'"
+                class="cursor-pointer"
+                @click="isPwd = !isPwd"
+              />
+            </template>
+          </q-input>
+
           <q-banner v-if="error" class="bg-negative text-white q-mb-md" rounded>
             <template v-slot:avatar>
               <q-icon name="error" color="white" />
@@ -66,7 +104,7 @@
             label="Login"
             color="primary"
             :loading="loading"
-            :disable="!username || loading"
+            :disable="!username || !password || loading"
             class="full-width"
           />
         </q-form>
