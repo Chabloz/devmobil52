@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import { isAuth, ws, users, allMsg } from '@/store/chat.js';
 import TheChatToolbar from './components/TheChatToolbar.vue';
@@ -10,33 +10,39 @@ import TheChatUsersList from './components/TheChatUsersList.vue';
 import { connectToChat } from '@/store/chat.js';
 
 const $q = useQuasar();
-const tryingAutoLogin = ref(true);
 
-ws.on('close', async () => {
+ws.on('close', () => {
   if (isAuth.value) {
-    try {
-      await connectToChat();
-      return;
-    } catch {
-      $q.notify({
-        type: 'negative',
-        message: 'Connection to server lost !',
-        timeout: 2000,
-        position: 'top',
-      });
-    }
+    $q.notify({
+      type: 'negative',
+      message: 'Connection to server lost !',
+      timeout: 2000,
+      position: 'top',
+    });
   }
-
   isAuth.value = false;
   users.value = [];
   allMsg.value = [];
 });
 
+const tryingAutoLogin = ref(true);
 connectToChat()
   .catch(() => {})
-  .finally(() => {
-    tryingAutoLogin.value = false;
-  });
+  .finally(() => tryingAutoLogin.value = false);
+
+function handleVisibilityChange() {
+  if (document.visibilityState === 'visible' && !isAuth.value) {
+    connectToChat().catch(() => {});
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('visibilitychange', handleVisibilityChange);
+});
 </script>
 
 <template>
@@ -50,9 +56,8 @@ connectToChat()
     <q-page-container>
       <q-page v-if="!tryingAutoLogin" padding :class="{ 'no-scroll': !isAuth }">
         <TheLoginPage v-if="!isAuth" />
-        <TheChatMessagesList v-else />
+        <TheChatMessagesList v-if="isAuth" />
       </q-page>
-
       <q-page v-if="tryingAutoLogin" class="flex flex-center">
         <q-spinner size="50px" color="primary" />
       </q-page>
@@ -70,12 +75,15 @@ connectToChat()
   display: flex;
   flex-direction: column;
 }
+
 .q-page {
   overflow-y: auto;
 }
+
 .no-scroll {
   overflow: hidden;
 }
+
 .no-shadow {
   box-shadow: none;
 }
