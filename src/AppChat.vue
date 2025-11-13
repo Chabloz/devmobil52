@@ -1,47 +1,43 @@
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue';
-import { useQuasar } from 'quasar';
-import { isAuth, ws, users, allMsg } from '@/store/chat.js';
-import TheChatToolbar from './components/TheChatToolbar.vue';
-import TheLoginPage from './components/TheLoginPage.vue';
-import TheChatForm from './components/TheChatForm.vue';
-import TheChatMessagesList from './components/TheChatMessagesList.vue';
-import TheChatUsersList from './components/TheChatUsersList.vue';
-import { connectToChat } from '@/store/chat.js';
+  import { onMounted, onUnmounted, ref } from 'vue';
+  import { useQuasar } from 'quasar';
+  import { isAuth, ws, users, allMsg } from '@/store/chat.js';
+  import TheChatToolbar from './components/TheChatToolbar.vue';
+  import TheLoginPage from './components/TheLoginPage.vue';
+  import TheChatForm from './components/TheChatForm.vue';
+  import TheChatMessagesList from './components/TheChatMessagesList.vue';
+  import TheChatUsersList from './components/TheChatUsersList.vue';
+  import { connectToChat } from '@/store/chat.js';
 
-const $q = useQuasar();
+  const $q = useQuasar();
 
-ws.on('close', () => {
-  if (isAuth.value) {
-    $q.notify({
-      type: 'negative',
-      message: 'Connection to server lost !',
-      timeout: 2000,
-      position: 'top',
-    });
+  ws.on('close', () => {
+    if (isAuth.value) {
+      $q.notify({
+        type: 'negative',
+        message: 'Connection to server lost',
+        timeout: 2000,
+        position: 'top',
+      });
+    }
+    isAuth.value = false;
+    users.value = [];
+    allMsg.value = [];
+  });
+
+  function handleVisibilityChange() {
+    if (document.visibilityState != 'visible' || isAuth.value) return;
+    connectToChat().catch(() => {});
   }
-  isAuth.value = false;
-  users.value = [];
-  allMsg.value = [];
-});
 
-const tryingAutoLogin = ref(true);
+  onMounted(() => {
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    connectToChat().catch(() => {});
+  });
 
-function handleVisibilityChange() {
-  if (document.visibilityState != 'visible' || isAuth.value) return;
-  connectToChat().catch(() => {});
-}
-
-onMounted(() => {
-  document.addEventListener('visibilitychange', handleVisibilityChange);
-  connectToChat()
-    .catch(() => {})
-    .finally(() => tryingAutoLogin.value = false);
-});
-
-onUnmounted(() => {
-  document.removeEventListener('visibilitychange', handleVisibilityChange);
-});
+  onUnmounted(() => {
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+  });
 </script>
 
 <template>
@@ -53,12 +49,9 @@ onUnmounted(() => {
     <TheChatUsersList />
 
     <q-page-container>
-      <q-page v-if="!tryingAutoLogin" padding :class="{ 'no-scroll': !isAuth }">
+      <q-page padding :class="{ 'no-scroll': !isAuth }">
         <TheLoginPage v-if="!isAuth" />
         <TheChatMessagesList v-if="isAuth" />
-      </q-page>
-      <q-page v-if="tryingAutoLogin" class="flex flex-center">
-        <q-spinner size="50px" color="primary" />
       </q-page>
     </q-page-container>
 
@@ -69,21 +62,21 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.q-page-container {
-  max-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+  .q-page-container {
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
 
-.q-page {
-  overflow-y: auto;
-}
+  .q-page {
+    overflow-y: auto;
+  }
 
-.no-scroll {
-  overflow: hidden;
-}
+  .no-scroll {
+    overflow: hidden;
+  }
 
-.no-shadow {
-  box-shadow: none;
-}
+  .no-shadow {
+    box-shadow: none;
+  }
 </style>
