@@ -26,18 +26,17 @@ ws.on('close', () => {
 });
 
 const tryingAutoLogin = ref(true);
-connectToChat()
-  .catch(() => {})
-  .finally(() => tryingAutoLogin.value = false);
 
 function handleVisibilityChange() {
-  if (document.visibilityState === 'visible' && !isAuth.value) {
-    connectToChat().catch(() => {});
-  }
+  if (document.visibilityState != 'visible' || isAuth.value) return;
+  connectToChat().catch(() => {});
 }
 
 onMounted(() => {
   document.addEventListener('visibilitychange', handleVisibilityChange);
+  connectToChat()
+    .catch(() => {})
+    .finally(() => tryingAutoLogin.value = false);
 });
 
 onUnmounted(() => {
