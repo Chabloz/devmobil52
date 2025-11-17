@@ -7,5 +7,8 @@ const router = express.Router();
 // Auth routes
 router.post('/auth/login', login);
 router.post('/auth/logout', logout);
+router.get('/foo', (req, res) => {
+  res.json({ message: 'bar' });
+});
 
 export default router;

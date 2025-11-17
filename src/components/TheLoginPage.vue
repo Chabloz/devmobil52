@@ -41,7 +41,7 @@
   <q-page class="flex flex-center">
     <q-card class="login-card q-pa-md" :class="{ 'no-shadow': $q.dark.isActive }">
       <q-card-section>
-        <div class="text-h5 text-center q-mb-md">IM Chat</div>
+        <div class="text-h5 text-center q-mb-md">IM Chat test</div>
       </q-card-section>
 
       <q-card-section>
