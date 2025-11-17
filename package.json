@@ -12,7 +12,6 @@
   "dependencies": {
     "@quasar/extras": "^1.17.0",
     "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
     "mainloop.js": "^1.0.4",
     "quasar": "^2.18.5",
     "vue": "^3.5.18",
