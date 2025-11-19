@@ -36,7 +36,7 @@ export function useFetchJson(options) {
     const { request, abort: newAbort } = fetchJson(finalOptions);
     curAbort = newAbort;
 
-    request
+    return request
       .then(res => data.value = res)
       .catch(err => error.value = err)
       .finally(() => {
